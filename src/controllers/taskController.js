@@ -5,8 +5,15 @@ class TaskController {
 
     static async createTask(req, res) {
         try {
-            const novaTask = await Task.create(req.body);
-            res.status(201).json({message: "Task criada com sucesso", task: novaTask});
+            const { title, description } = req.body;
+
+            const newTask = await Task.create({
+                title,
+                description,
+                user: req.user.id // Salva a task para o usuário autenticado
+            });
+
+            res.status(201).json({message: "Task criada com sucesso", task: newTask});
         }
         catch (erro) {
             res.status(500).json({message: erro.message});

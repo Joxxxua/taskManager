@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager</title>
+    <style>
+        .error-message {
+            color: red;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="auth">
+        <h1>Cadastro</h1>
+        <form id="registerForm">
+            <input type="text" id="name" placeholder="Nome" required>
+            <input type="email" id="email" placeholder="E-mail" required>
+            <input type="password" id="password" placeholder="Senha" required>
+            <button type="submit">Cadastrar</button>
+        </form>
+        <h1>Login</h1>
+        <form id="loginForm">
+            <input type="email" id="loginEmail" placeholder="E-mail" required>
+            <input type="password" id="loginPassword" placeholder="Senha" required>
+            <button type="submit">Entrar</button>
+        </form>
+    </div>
+    <div id="taskManager" style="display:none;">
+        <h1>Gerenciador de Tasks</h1>
+        <form id="taskForm">
+            <input type="text" id="taskTitle" placeholder="Título" required>
+            <input type="text" id="taskDescription" placeholder="Descrição">
+            <button type="submit">Criar Task</button>
+        </form>
+        <h2>Minhas Tasks</h2>
+        <ul id="taskList"></ul>
+        <button onclick="logout()">Sair</button>
+    </div>
+    <script>
+        document.getElementById("registerForm").addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const name = document.getElementById("name").value;
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+            const response = await fetch("http://localhost:3000/register", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name, email, password })
+            });
+            const data = await response.json();
+            alert(data.message);
+        });
+        
+        document.getElementById("loginForm").addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const email = document.getElementById("loginEmail").value;
+            const password = document.getElementById("loginPassword").value;
+            const response = await fetch("http://localhost:3000/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password })
+            });
+            const data = await response.json();
+            if (response.ok) {
+                localStorage.setItem("token", data.token);
+                showTaskManager();
+            } else {
+                alert(data.message);
+            }
+        });
+        
+        document.getElementById("taskForm").addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const token = localStorage.getItem("token");
+            const title = document.getElementById("taskTitle").value;
+            const description = document.getElementById("taskDescription").value;
+            const response = await fetch("http://localhost:3000/tasks", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+                body: JSON.stringify({ title, description })
+            });
+            const data = await response.json();
+            alert(data.message);
+            loadTasks();
+        });
+        
+        async function loadTasks() {
+            const token = localStorage.getItem("token");
+            const response = await fetch("http://localhost:3000/tasks", {
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+            const tasks = await response.json();
+            const taskList = document.getElementById("taskList");
+            taskList.innerHTML = "";
+            tasks.forEach(task => {
+                const li = document.createElement("li");
+                li.textContent = `${task.title} - ${task.description}`;
+                taskList.appendChild(li);
+            });
+        }
+        
+        function showTaskManager() {
+            document.getElementById("auth").style.display = "none";
+            document.getElementById("taskManager").style.display = "block";
+            loadTasks();
+        }
+        
+        function logout() {
+            localStorage.removeItem("token");
+            document.getElementById("auth").style.display = "block";
+            document.getElementById("taskManager").style.display = "none";
+        }
+    </script>
+</body>
+</html>

@@ -1,6 +1,6 @@
-import Joi, { string } from "joi";
+import Joi from "joi";
 
-export const registerSchema = Joi.object({
+const registerSchema = Joi.object({
     name: Joi.string().min(3).required().messages({
         'string.empty': 'O campo nome é obrigatório.',
       'string.min': 'O campo nome deve ter pelo menos 3 caracteres.',
@@ -15,3 +15,5 @@ export const registerSchema = Joi.object({
         'string.pattern.base': 'O campo senha deve começar com uma letra maiúscula.',
       }),
 });
+
+export default registerSchema;
