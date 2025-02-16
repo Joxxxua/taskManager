@@ -30,20 +30,6 @@ class TaskController {
         }
     }
  
-    static async getTaskById (req, res) {
-        try {
-            const {id} = req.params;
-            const taskFound = await Task.findById(id);
-            if (taskFound != null){
-                res.status(200).json(taskFound);
-            }else{
-                res.status(404).json({message: "Task não encontrada"});
-            }
-        }
-        catch (error) {
-            res.status(500).json({message: error.message});
-        }
-    }
 
     static async updateTask (req, res) {
         try{

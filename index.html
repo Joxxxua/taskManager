@@ -22,13 +22,37 @@
             <input type="password" id="password" placeholder="Senha" required>
             <button type="submit">Cadastrar</button>
         </form>
+        
         <h1>Login</h1>
         <form id="loginForm">
             <input type="email" id="loginEmail" placeholder="E-mail" required>
             <input type="password" id="loginPassword" placeholder="Senha" required>
             <button type="submit">Entrar</button>
         </form>
+        <button onclick="showForgotPasswordForm()">Esqueci minha senha</button>
     </div>
+
+    <!-- Formulário de recuperação de senha -->
+    <div id="forgotPasswordForm" style="display:none;">
+        <h1>Recuperar Senha</h1>
+        <form id="forgotPassword">
+            <input type="email" id="forgotEmail" placeholder="Digite seu e-mail" required>
+            <button type="submit">Enviar Link de Recuperação</button>
+        </form>
+        <button onclick="backToLogin()">Voltar</button>
+    </div>
+
+    <!-- Formulário para redefinir a senha -->
+    <div id="resetPasswordForm" style="display:none;">
+        <h1>Redefinir Senha</h1>
+        <form id="resetPassword">
+            <input type="text" id="resetToken" placeholder="Token" required>
+            <input type="password" id="newPassword" placeholder="Nova Senha" required>
+            <button type="submit">Redefinir Senha</button>
+        </form>
+        <button onclick="backToLogin()">Voltar</button>
+    </div>
+
     <div id="taskManager" style="display:none;">
         <h1>Gerenciador de Tasks</h1>
         <form id="taskForm">
@@ -40,6 +64,7 @@
         <ul id="taskList"></ul>
         <button onclick="logout()">Sair</button>
     </div>
+
     <script>
         document.getElementById("registerForm").addEventListener("submit", async (event) => {
             event.preventDefault();
@@ -54,7 +79,7 @@
             const data = await response.json();
             alert(data.message);
         });
-        
+
         document.getElementById("loginForm").addEventListener("submit", async (event) => {
             event.preventDefault();
             const email = document.getElementById("loginEmail").value;
@@ -72,7 +97,7 @@
                 alert(data.message);
             }
         });
-        
+
         document.getElementById("taskForm").addEventListener("submit", async (event) => {
             event.preventDefault();
             const token = localStorage.getItem("token");
@@ -87,7 +112,7 @@
             alert(data.message);
             loadTasks();
         });
-        
+
         async function loadTasks() {
             const token = localStorage.getItem("token");
             const response = await fetch("http://localhost:3000/tasks", {
@@ -102,18 +127,56 @@
                 taskList.appendChild(li);
             });
         }
-        
+
         function showTaskManager() {
             document.getElementById("auth").style.display = "none";
             document.getElementById("taskManager").style.display = "block";
             loadTasks();
         }
-        
+
         function logout() {
             localStorage.removeItem("token");
             document.getElementById("auth").style.display = "block";
             document.getElementById("taskManager").style.display = "none";
         }
+
+        function showForgotPasswordForm() {
+            document.getElementById("auth").style.display = "none";
+            document.getElementById("forgotPasswordForm").style.display = "block";
+        }
+
+        function backToLogin() {
+            document.getElementById("forgotPasswordForm").style.display = "none";
+            document.getElementById("resetPasswordForm").style.display = "none";
+            document.getElementById("auth").style.display = "block";
+        }
+
+        document.getElementById("forgotPassword").addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const email = document.getElementById("forgotEmail").value;
+            const response = await fetch("http://localhost:3000/forgot-password", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email })
+            });
+            const data = await response.json();
+            alert(data.message);
+        });
+
+        document.getElementById("resetPassword").addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const token = document.getElementById("resetToken").value;
+            const newPassword = document.getElementById("newPassword").value;
+            const response = await fetch("http://localhost:3000/reset-password", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ token, newPassword })
+            });
+            const data = await response.json();
+            alert(data.message);
+            backToLogin();
+        });
+
     </script>
 </body>
 </html>
