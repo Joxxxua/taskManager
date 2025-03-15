@@ -12,7 +12,7 @@ const authMiddleware = (req, res, next) => {
     }
 
     try {
-        console.log("Chave secreta:", process.env.SECRET);
+       
         const decoded = jwt.verify(token.replace("Bearer ", ""),process.env.SECRET);
         req.user = decoded; // Adiciona o usuário na requisição
         next();

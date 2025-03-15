@@ -4,20 +4,29 @@ import mongoose from "mongoose";
 class TaskController {
 
     static async createTask(req, res) {
-        try {
-            const { title, description } = req.body;
-
-            const newTask = await Task.create({
-                title,
-                description,
-                user: req.user.id // Salva a task para o usuário autenticado
-            });
-
-            res.status(201).json({message: "Task criada com sucesso", task: newTask});
+         {
+            try {
+                const { title, description } = req.body;
+        
+                if (!req.user) {
+                    return res.status(401).json({ message: "Usuário não autenticado" });
+                }
+        
+                const newTask = new Task({
+                    title,
+                    description,
+                    userId: req.user.id // Agora está correto!
+                });
+        
+                await newTask.save();
+        
+                res.status(201).json({ message: "Task criada com sucesso", task: newTask });
+        
+            } catch (erro) {
+                res.status(500).json({ message: erro.message });
+            }
         }
-        catch (erro) {
-            res.status(500).json({message: erro.message});
-        }
+        
     }
 
     static async listTasks(req, res) {

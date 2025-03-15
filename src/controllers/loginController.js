@@ -36,10 +36,15 @@ class LoginController {
                 process.env.SECRET, // Troque por uma variável de ambiente
                 { expiresIn: "1h" } // Token válido por 1 hora
             );
-            
-            res.status(200).json({ message: "Login bem-sucedido!" ,
-                token 
+          
+            res.cookie("token", token, {
+                httpOnly: true, // Protege contra XSS
+                secure: process.env.NODE_ENV === "production", // Somente HTTPS em produção
+                sameSite: "Strict", // Protege contra CSRF
+                maxAge: 7 * 24 * 60 * 60 * 1000, // Expira em 7 dias
             });
+            
+            res.status(200).json({ message: "Login bem-sucedido!"  });
 
         }catch(error){
             res.status(500).json({ message: `Erro ao fazer login: ${error.message}` });
@@ -87,6 +92,7 @@ class LoginController {
             const {token, newPassword} = req.body;
 
             const decoded = jwt.verify(token, process.env.SECRET);
+            
             
             const user = await User.findById(decoded.id);
 
