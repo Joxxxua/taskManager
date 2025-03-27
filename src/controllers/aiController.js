@@ -1,6 +1,6 @@
 
-process.env.OPENAI_API_KEY = "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";
-process.env.TAVILY_API_KEY = "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";
+process.env.OPENAI_API_KEY
+process.env.TAVILY_API_KEY 
 
 // AiController.js
 import Task from "../models/TaskModel.js";
