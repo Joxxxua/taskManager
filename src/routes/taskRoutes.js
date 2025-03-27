@@ -5,6 +5,7 @@ import authMiddleware from '../middlewares/authMiddleware.js';
 const routes = express.Router();
 
 routes.post('/tasks',authMiddleware, TaskController.createTask);
-routes.get('/tasks', TaskController.listTasks);
+routes.get('/tasks', authMiddleware ,TaskController.listTasks);
+routes.delete("/tasks/:id", authMiddleware, TaskController.deleteTask);
 
 export default routes;

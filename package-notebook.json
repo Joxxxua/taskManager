@@ -12,10 +12,10 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@langchain/community": "^0.3.36",
-    "@langchain/core": "^0.3.42",
+    "@langchain/community": "^0.3.37",
+    "@langchain/core": "^0.3.43",
     "@langchain/langgraph": "^0.2.57",
-    "@langchain/openai": "^0.4.7",
+    "@langchain/openai": "^0.4.8",
     "bcrypt": "^5.1.1",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",

@@ -4,132 +4,521 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Task Manager</title>
+    <!-- Adicionar Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .error-message {
-            color: red;
-            font-size: 14px;
-            margin-top: 5px;
-            display: none;
+        /* Configuração de cores personalizadas do Tailwind */
+        :root {
+            --primary-color: #3b82f6;
+            --primary-hover: #2563eb;
+            --error-color: #ef4444;
         }
     </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: 'var(--primary-color)',
+                        'primary-hover': 'var(--primary-hover)',
+                        error: 'var(--error-color)',
+                    }
+                }
+            }
+        }
+    </script>
 </head>
-<body>
-    <div id="auth">
-        <h1>Cadastro</h1>
-        <form id="registerForm">
-            <input type="text" id="name" placeholder="Nome" required>
-            <input type="email" id="email" placeholder="E-mail" required>
-            <input type="password" id="password" placeholder="Senha" required>
-            <button type="submit">Cadastrar</button>
-        </form>
-        
-        <h1>Login</h1>
-        <form id="loginForm">
-            <input type="email" id="loginEmail" placeholder="E-mail" required>
-            <input type="password" id="loginPassword" placeholder="Senha" required>
-            <button type="submit">Entrar</button>
-        </form>
-        <button onclick="showForgotPasswordForm()">Esqueci minha senha</button>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-md">
+        <!-- Seção de Autenticação -->
+        <div id="auth" class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h1 class="text-2xl font-bold mb-4 text-gray-800">Cadastro</h1>
+            <form id="registerForm" class="space-y-4 mb-8">
+                <div>
+                    <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nome</label>
+                    <input type="text" id="name" placeholder="Nome" required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
+                </div>
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-1">E-mail</label>
+                    <input type="email" id="email" placeholder="E-mail" required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
+                </div>
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Senha</label>
+                    <input type="password" id="password" placeholder="Senha" required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
+                </div>
+                <button type="submit" 
+                    class="w-full bg-primary text-white py-2 px-4 rounded-md hover:bg-primary-hover transition duration-200">
+                    Cadastrar
+                </button>
+            </form>
+            
+            <h1 class="text-2xl font-bold mb-4 text-gray-800">Login</h1>
+            <form id="loginForm" class="space-y-4 mb-4">
+                <div>
+                    <label for="loginEmail" class="block text-sm font-medium text-gray-700 mb-1">E-mail</label>
+                    <input type="email" id="loginEmail" placeholder="E-mail" required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
+                </div>
+                <div>
+                    <label for="loginPassword" class="block text-sm font-medium text-gray-700 mb-1">Senha</label>
+                    <input type="password" id="loginPassword" placeholder="Senha" required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
+                </div>
+                <button type="submit" 
+                    class="w-full bg-primary text-white py-2 px-4 rounded-md hover:bg-primary-hover transition duration-200">
+                    Entrar
+                </button>
+            </form>
+            <button onclick="showForgotPasswordForm()" 
+                class="text-primary hover:text-primary-hover text-sm font-medium">
+                Esqueci minha senha
+            </button>
+        </div>
+
+        <!-- Formulário de recuperação de senha -->
+        <div id="forgotPasswordForm" style="display:none;" class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h1 class="text-2xl font-bold mb-4 text-gray-800">Recuperar Senha</h1>
+            <form id="forgotPassword" class="space-y-4 mb-4">
+                <div>
+                    <label for="forgotEmail" class="block text-sm font-medium text-gray-700 mb-1">E-mail</label>
+                    <input type="email" id="forgotEmail" placeholder="Digite seu e-mail" required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
+                </div>
+                <button type="submit" 
+                    class="w-full bg-primary text-white py-2 px-4 rounded-md hover:bg-primary-hover transition duration-200">
+                    Enviar Link de Recuperação
+                </button>
+            </form>
+            <button onclick="backToLogin()" 
+                class="text-gray-600 hover:text-gray-800 text-sm font-medium">
+                Voltar
+            </button>
+        </div>
+
+        <!-- Formulário para redefinir a senha -->
+        <div id="resetPasswordForm" style="display:none;" class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h1 class="text-2xl font-bold mb-4 text-gray-800">Redefinir Senha</h1>
+            <form id="resetPassword" class="space-y-4 mb-4">
+                <div>
+                    <label for="resetToken" class="block text-sm font-medium text-gray-700 mb-1">Token</label>
+                    <input type="text" id="resetToken" placeholder="Token" required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
+                </div>
+                <div>
+                    <label for="newPassword" class="block text-sm font-medium text-gray-700 mb-1">Nova Senha</label>
+                    <input type="password" id="newPassword" placeholder="Nova Senha" required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
+                </div>
+                <button type="submit" 
+                    class="w-full bg-primary text-white py-2 px-4 rounded-md hover:bg-primary-hover transition duration-200">
+                    Redefinir Senha
+                </button>
+            </form>
+            <button onclick="backToLogin()" 
+                class="text-gray-600 hover:text-gray-800 text-sm font-medium">
+                Voltar
+            </button>
+        </div>
+
+        <!-- Gerenciador de Tarefas -->
+        <div id="taskManager" style="display:none;" class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-2xl font-bold text-gray-800">Gerenciador de Tasks</h1>
+                <button onclick="logout()" 
+                    class="bg-gray-200 text-gray-700 py-1 px-3 rounded-md hover:bg-gray-300 transition duration-200">
+                    Sair
+                </button>
+            </div>
+            
+            <form id="taskForm" class="space-y-4 mb-8 border-b pb-6">
+                <div>
+                    <label for="taskTitle" class="block text-sm font-medium text-gray-700 mb-1">Título</label>
+                    <input type="text" id="taskTitle" placeholder="Título" required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
+                </div>
+                <div>
+                    <label for="taskDescription" class="block text-sm font-medium text-gray-700 mb-1">Descrição</label>
+                    <textarea id="taskDescription" placeholder="Descrição" rows="3"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"></textarea>
+                </div>
+                <button type="submit" 
+                    class="w-full bg-primary text-white py-2 px-4 rounded-md hover:bg-primary-hover transition duration-200">
+                    Criar Task
+                </button>
+            </form>
+            
+            <h2 class="text-xl font-semibold mb-4 text-gray-800">Minhas Tasks</h2>
+            <div id="taskList" class="space-y-3">
+                <!-- As tarefas serão adicionadas aqui dinamicamente -->
+                <p id="emptyTaskMessage" class="text-gray-500 text-center py-4">Você ainda não tem tarefas.</p>
+            </div>
+        </div>
     </div>
 
-    <!-- Formulário de recuperação de senha -->
-    <div id="forgotPasswordForm" style="display:none;">
-        <h1>Recuperar Senha</h1>
-        <form id="forgotPassword">
-            <input type="email" id="forgotEmail" placeholder="Digite seu e-mail" required>
-            <button type="submit">Enviar Link de Recuperação</button>
-        </form>
-        <button onclick="backToLogin()">Voltar</button>
-    </div>
-
-    <!-- Formulário para redefinir a senha -->
-    <div id="resetPasswordForm" style="display:none;">
-        <h1>Redefinir Senha</h1>
-        <form id="resetPassword">
-            <input type="text" id="resetToken" placeholder="Token" required>
-            <input type="password" id="newPassword" placeholder="Nova Senha" required>
-            <button type="submit">Redefinir Senha</button>
-        </form>
-        <button onclick="backToLogin()">Voltar</button>
-    </div>
-
-    <div id="taskManager" style="display:none;">
-        <h1>Gerenciador de Tasks</h1>
-        <form id="taskForm">
-            <input type="text" id="taskTitle" placeholder="Título" required>
-            <input type="text" id="taskDescription" placeholder="Descrição">
-            <button type="submit">Criar Task</button>
-        </form>
-        <h2>Minhas Tasks</h2>
-        <ul id="taskList"></ul>
-        <button onclick="logout()">Sair</button>
+    <!-- Toast de notificação -->
+    <div id="toast" class="fixed bottom-4 right-4 bg-gray-800 text-white px-4 py-2 rounded-md shadow-lg transform transition-transform duration-300 translate-y-20 opacity-0">
+        <p id="toastMessage"></p>
     </div>
 
     <script>
+        // Função para mostrar toast de notificação
+        function showToast(message, isError = false) {
+            const toast = document.getElementById("toast");
+            const toastMessage = document.getElementById("toastMessage");
+            
+            toast.className = isError 
+                ? "fixed bottom-4 right-4 bg-error text-white px-4 py-2 rounded-md shadow-lg transform transition-transform duration-300"
+                : "fixed bottom-4 right-4 bg-gray-800 text-white px-4 py-2 rounded-md shadow-lg transform transition-transform duration-300";
+            
+            toastMessage.textContent = message;
+            toast.classList.remove("translate-y-20", "opacity-0");
+            
+            setTimeout(() => {
+                toast.classList.add("translate-y-20", "opacity-0");
+            }, 3000);
+        }
+
+        // Registro de usuário
         document.getElementById("registerForm").addEventListener("submit", async (event) => {
             event.preventDefault();
             const name = document.getElementById("name").value;
             const email = document.getElementById("email").value;
             const password = document.getElementById("password").value;
-            const response = await fetch("http://localhost:3000/register", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ name, email, password })
-            });
-            const data = await response.json();
-            alert(data.message);
+            
+            try {
+                const response = await fetch("http://localhost:3000/register", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ name, email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showToast(data.message || "Cadastro realizado com sucesso!");
+                    document.getElementById("registerForm").reset();
+                } else {
+                    showToast(data.message || "Erro ao cadastrar", true);
+                }
+            } catch (error) {
+                console.error("Erro:", error);
+                showToast("Erro de conexão com o servidor", true);
+            }
         });
 
+        // Login de usuário
         document.getElementById("loginForm").addEventListener("submit", async (event) => {
             event.preventDefault();
             const email = document.getElementById("loginEmail").value;
             const password = document.getElementById("loginPassword").value;
-            const response = await fetch("http://localhost:3000/login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, password })
-            });
-            const data = await response.json();
-            if (response.ok) {
-                localStorage.setItem("token", data.token);
-                showTaskManager();
-            } else {
-                alert(data.message);
+            
+            try {
+                const response = await fetch("http://localhost:3000/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Mostrar o token recebido para depuração
+                    console.log("Token recebido do servidor:", data.token);
+                    
+                    // Armazenar o token exatamente como recebido do servidor
+                    localStorage.setItem("token", data.token);
+                    
+                    // Verificar se o token foi armazenado corretamente
+                    console.log("Token armazenado:", localStorage.getItem("token"));
+                    
+                    showToast("Login realizado com sucesso!");
+                    showTaskManager();
+                } else {
+                    showToast(data.message || "Credenciais inválidas", true);
+                }
+            } catch (error) {
+                console.error("Erro:", error);
+                showToast("Erro de conexão com o servidor", true);
             }
         });
 
+        // Recuperação de senha
+        document.getElementById("forgotPassword").addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const email = document.getElementById("forgotEmail").value;
+            
+            try {
+                const response = await fetch("http://localhost:3000/forgot-password", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showToast(data.message || "Email de recuperação enviado!");
+                    document.getElementById("forgotPasswordForm").style.display = "none";
+                    document.getElementById("resetPasswordForm").style.display = "block";
+                } else {
+                    showToast(data.message || "Erro ao enviar email de recuperação", true);
+                }
+            } catch (error) {
+                console.error("Erro:", error);
+                showToast("Erro de conexão com o servidor", true);
+            }
+        });
+
+        // Redefinição de senha
+        document.getElementById("resetPassword").addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const token = document.getElementById("resetToken").value;
+            const newPassword = document.getElementById("newPassword").value;
+            
+            try {
+                const response = await fetch("http://localhost:3000/reset-password", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ token, newPassword })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showToast(data.message || "Senha redefinida com sucesso!");
+                    backToLogin();
+                } else {
+                    showToast(data.message || "Erro ao redefinir senha", true);
+                }
+            } catch (error) {
+                console.error("Erro:", error);
+                showToast("Erro de conexão com o servidor", true);
+            }
+        });
+
+        // Criação de tarefa
         document.getElementById("taskForm").addEventListener("submit", async (event) => {
             event.preventDefault();
             const token = localStorage.getItem("token");
+            
+            if (!token) {
+                showToast("Você precisa estar logado para criar tarefas", true);
+                logout();
+                return;
+            }
+            
+            // Verificar o token antes de enviar
+            console.log("Token recuperado do localStorage:", token);
+            
             const title = document.getElementById("taskTitle").value;
             const description = document.getElementById("taskDescription").value;
-            const response = await fetch("http://localhost:3000/tasks", {
-                method: "POST",
-                headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
-                body: JSON.stringify({ title, description })
-            });
-            const data = await response.json();
-            alert(data.message);
-            loadTasks();
+            
+            try {
+                // Enviar o token exatamente como está armazenado, sem modificação
+                console.log("Enviando token sem modificação:", token);
+                
+                const response = await fetch("http://localhost:3000/tasks", {
+                    method: "POST",
+                    headers: { 
+                        "Content-Type": "application/json", 
+                        "Authorization": token // Sem adicionar "Bearer "
+                    },
+                    body: JSON.stringify({ title, description })
+                });
+                
+                // Para depuração
+                console.log("Status da resposta:", response.status);
+                
+                const data = await response.json();
+                console.log("Resposta completa:", data);
+                
+                if (response.ok) {
+                    showToast(data.message || "Tarefa criada com sucesso!");
+                    document.getElementById("taskForm").reset();
+                    loadTasks();
+                } else {
+                    showToast(data.message || "Erro ao criar tarefa", true);
+                    if (response.status === 401 || response.status === 400) {
+                        console.error("Erro de autenticação:", data.message);
+                        // Se o token for inválido, faça logout
+                        setTimeout(() => {
+                            logout();
+                        }, 2000);
+                    }
+                }
+            } catch (error) {
+                console.error("Erro completo:", error);
+                showToast("Erro de conexão com o servidor", true);
+            }
         });
 
+        // Carregar tarefas
         async function loadTasks() {
             const token = localStorage.getItem("token");
-            const response = await fetch("http://localhost:3000/tasks", {
-                headers: { "Authorization": `Bearer ${token}` }
-            });
-            const tasks = await response.json();
+            
+            if (!token) {
+                showToast("Você precisa estar logado para ver tarefas", true);
+                logout();
+                return;
+            }
+            
             const taskList = document.getElementById("taskList");
-            taskList.innerHTML = "";
-            tasks.forEach(task => {
-                const li = document.createElement("li");
-                li.textContent = `${task.title} - ${task.description}`;
-                taskList.appendChild(li);
-            });
+            const emptyMessage = document.getElementById("emptyTaskMessage");
+            
+            try {
+                // Enviar o token exatamente como está armazenado, sem modificação
+                console.log("Carregando tarefas com token sem modificação:", token);
+                
+                const response = await fetch("http://localhost:3000/tasks", {
+                    headers: { "Authorization": token } // Sem adicionar "Bearer "
+                });
+                
+                // Para depuração
+                console.log("Status da resposta:", response.status);
+                
+                if (!response.ok) {
+                    if (response.status === 401 || response.status === 400) {
+                        showToast("Sessão expirada. Faça login novamente.", true);
+                        setTimeout(() => {
+                            logout();
+                        }, 2000);
+                        return;
+                    }
+                    throw new Error("Falha ao carregar tarefas");
+                }
+                
+                const tasks = await response.json();
+                console.log("Tarefas carregadas:", tasks);
+                
+                // Limpar a lista de tarefas
+                taskList.innerHTML = "";
+                
+                if (tasks.length === 0) {
+                    taskList.appendChild(emptyMessage);
+                    return;
+                }
+                
+                // Adicionar cada tarefa à lista
+                tasks.forEach(task => {
+                    const taskElement = document.createElement("div");
+                    taskElement.className = "p-4 border rounded-md hover:bg-gray-50";
+                    taskElement.innerHTML = `
+                        <div class="flex items-start gap-3">
+                            <input type="checkbox" id="task-${task.id}" 
+                                class="mt-1 h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary"
+                                ${task.completed ? 'checked' : ''}>
+                            <div class="flex-1">
+                                <label for="task-${task.id}" class="block font-medium ${task.completed ? 'line-through text-gray-400' : 'text-gray-700'}">
+                                    ${task.title}
+                                </label>
+                                ${task.description ? `<p class="text-sm mt-1 ${task.completed ? 'text-gray-400' : 'text-gray-600'}">${task.description}</p>` : ''}
+                            </div>
+                            <button class="text-error hover:text-red-700 ml-2" onclick="deleteTask('${task.id}')">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                        </div>
+                    `;
+                    
+                    // Adicionar evento para marcar como concluída
+                    const checkbox = taskElement.querySelector(`#task-${task.id}`);
+                    checkbox.addEventListener('change', () => toggleTaskComplete(task.id, checkbox.checked));
+                    
+                    taskList.appendChild(taskElement);
+                });
+                
+            } catch (error) {
+                console.error("Erro ao carregar tarefas:", error);
+                showToast("Erro ao carregar tarefas", true);
+            }
         }
 
+        // Marcar tarefa como concluída/não concluída
+        async function toggleTaskComplete(taskId, completed) {
+            const token = localStorage.getItem("token");
+            
+            if (!token) {
+                showToast("Você precisa estar logado para atualizar tarefas", true);
+                logout();
+                return;
+            }
+            
+            try {
+                // Enviar o token exatamente como está armazenado, sem modificação
+                const response = await fetch(`http://localhost:3000/tasks/${taskId}`, {
+                    method: "PATCH",
+                    headers: { 
+                        "Content-Type": "application/json", 
+                        "Authorization": token // Sem adicionar "Bearer "
+                    },
+                    body: JSON.stringify({ completed })
+                });
+                
+                if (!response.ok) {
+                    if (response.status === 401 || response.status === 400) {
+                        showToast("Sessão expirada. Faça login novamente.", true);
+                        setTimeout(() => {
+                            logout();
+                        }, 2000);
+                        return;
+                    }
+                    throw new Error("Falha ao atualizar tarefa");
+                }
+                
+                loadTasks(); // Recarregar a lista para atualizar a interface
+                
+            } catch (error) {
+                console.error("Erro ao atualizar tarefa:", error);
+                showToast("Erro ao atualizar tarefa", true);
+            }
+        }
+
+        // Excluir tarefa
+        async function deleteTask(taskId) {
+            const token = localStorage.getItem("token");
+            
+            if (!token) {
+                showToast("Você precisa estar logado para excluir tarefas", true);
+                logout();
+                return;
+            }
+            
+            try {
+                // Enviar o token exatamente como está armazenado, sem modificação
+                const response = await fetch(`http://localhost:3000/tasks/${taskId}`, {
+                    method: "DELETE",
+                    headers: { "Authorization": token } // Sem adicionar "Bearer "
+                });
+                
+                if (!response.ok) {
+                    if (response.status === 401 || response.status === 400) {
+                        showToast("Sessão expirada. Faça login novamente.", true);
+                        setTimeout(() => {
+                            logout();
+                        }, 2000);
+                        return;
+                    }
+                    throw new Error("Falha ao excluir tarefa");
+                }
+                
+                showToast("Tarefa excluída com sucesso!");
+                loadTasks();
+                
+            } catch (error) {
+                console.error("Erro ao excluir tarefa:", error);
+                showToast("Erro ao excluir tarefa", true);
+            }
+        }
+
+        // Funções de navegação
         function showTaskManager() {
             document.getElementById("auth").style.display = "none";
+            document.getElementById("forgotPasswordForm").style.display = "none";
+            document.getElementById("resetPasswordForm").style.display = "none";
             document.getElementById("taskManager").style.display = "block";
             loadTasks();
         }
@@ -151,32 +540,14 @@
             document.getElementById("auth").style.display = "block";
         }
 
-        document.getElementById("forgotPassword").addEventListener("submit", async (event) => {
-            event.preventDefault();
-            const email = document.getElementById("forgotEmail").value;
-            const response = await fetch("http://localhost:3000/forgot-password", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email })
-            });
-            const data = await response.json();
-            alert(data.message);
+        // Verificar se o usuário já está logado ao carregar a página
+        document.addEventListener("DOMContentLoaded", () => {
+            const token = localStorage.getItem("token");
+            if (token) {
+                console.log("Token encontrado no carregamento da página:", token);
+                showTaskManager();
+            }
         });
-
-        document.getElementById("resetPassword").addEventListener("submit", async (event) => {
-            event.preventDefault();
-            const token = document.getElementById("resetToken").value;
-            const newPassword = document.getElementById("newPassword").value;
-            const response = await fetch("http://localhost:3000/reset-password", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ token, newPassword })
-            });
-            const data = await response.json();
-            alert(data.message);
-            backToLogin();
-        });
-
     </script>
 </body>
 </html>
