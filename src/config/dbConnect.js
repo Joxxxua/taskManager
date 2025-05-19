@@ -1,9 +1,13 @@
+import dotenv from 'dotenv'
 import mongoose from 'mongoose';
 
+dotenv.config();
 mongoose.set('strictQuery', true); // Suppress the strictQuery warning
 
+const mongoUri = process.env.MONGODB_URI;
+
 async function conectarNaDatabase() {
-    await mongoose.connect("mongodb+srv://joaopedrosouzarodri:vIyRJl26zsGKRu38@cluster0.rlkzp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0");
+    await mongoose.connect(mongoUri);
     return mongoose.connection;
 }
 
